@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="tran">#FFFFFFFF</color>
+    <color name="map_darker">#33333333</color>
 </resources>

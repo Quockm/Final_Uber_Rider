@@ -1,5 +1,6 @@
 package com.example.final_uber_rider;
 
+import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -160,5 +161,16 @@ public class Common {
     public static String formatAdrress(String start_address) {
         int firstIndexOfComma = start_address.indexOf(",");
         return start_address.substring(0,firstIndexOfComma); // get only address
+    }
+
+    public static ValueAnimator valueAnimate(long duration, ValueAnimator.AnimatorUpdateListener listener){
+        ValueAnimator va = ValueAnimator.ofFloat(0, 100);
+        va.setDuration(duration);
+        va.addUpdateListener(listener);
+        va.setRepeatCount(ValueAnimator.INFINITE);
+        va.setRepeatMode(ValueAnimator.RESTART);
+
+        va.start();
+        return va;
     }
 }

@@ -36,7 +36,8 @@
     <string name="central_park">Central Park</string>
     <string name="pay_by_cash">Pay by Cash</string>
     <string name="confirm_uber">Confirm Uber</string>
-    <string name="confitm_pickup_spot">Confitm Pickup Spot</string>
+    <string name="confitm_pickup_spot">Confirm Pickup Spot</string>
     <string name="demo_address">127/15 le thuc hoach VN</string>
     <string name="meet_driver_here">Meet Driver here</string>
+    <string name="finding_your_driver">Finding your Driver</string>
 </resources>
