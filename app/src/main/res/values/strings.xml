@@ -26,4 +26,12 @@
     <string name="permisson_require" />
     <string name="drivers_not_found">Driver not found</string>
     <string name="key_no_found"> Key not found</string>
+    <string name="wellcome">Wellcome</string>
+    <string name="choose_a_saved_place">Choose a saved place</string>
+    <string name="where_to">Where to?</string>
+    <string name="city_name_empty">City Name Empty</string>
+    <string name="help">Help</string>
+    <string name="history">Your Trip</string>
+    <string name="title_activity_request_driver">Map</string>
+    <string name="central_park">Central Park</string>
 </resources>

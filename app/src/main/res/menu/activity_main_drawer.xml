@@ -9,6 +9,14 @@
             android:icon="@drawable/ic_baseline_home_24"
             android:title="@string/menu_home" />
         <item
+            android:id="@+id/Your_Trip"
+            android:icon="@drawable/ic_baseline_history_24"
+            android:title="@string/history" />
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/ic_baseline_help_24"
+            android:title="@string/help" />
+        <item
             android:id="@+id/nav_sign_out"
             android:icon="@drawable/ic_baseline_exit_to_app_24"
             android:title="@string/menu_sign_out" />
