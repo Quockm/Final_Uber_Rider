@@ -23,9 +23,8 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class Common {
     public static final String RIDER_INFO_REFERENCE = "RiderInfo";
@@ -38,7 +37,7 @@ public class Common {
     public static final String TOKEN_REFERENCE = "Token";
     public static final String NOTI_TITLE = "Title";
     public static final String NOTI_CONTENT = "body";
-    public static Set<DriverGeoModel> driverfound = new HashSet<DriverGeoModel>();
+    public static Map<String,DriverGeoModel> driverfound = new HashMap<>();
     public static HashMap<String, Marker> makerList = new HashMap<>();
     public static HashMap<String, AnimationModel> driverLocationSubcribe = new HashMap<String, AnimationModel>();
 

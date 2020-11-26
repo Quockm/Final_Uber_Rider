@@ -5,11 +5,13 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.final_uber_rider.Remote.IGoogleAPI;
 import com.example.final_uber_rider.Remote.RetrofitClient;
+import com.example.final_uber_rider.model.DriverGeoModel;
 import com.example.final_uber_rider.model.EventBus.SelectPlaceEvent;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,6 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.SquareCap;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.maps.android.ui.IconGenerator;
 
 import org.greenrobot.eventbus.EventBus;
@@ -44,6 +48,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.sql.Driver;
+import java.time.LocalDate;
 import java.util.List;
 
 import butterknife.BindView;
@@ -68,6 +74,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private ValueAnimator lastPulseAnimator;
 
     //View
+    @BindView(R.id.main_layout)
+    RelativeLayout main_layout;
     @BindView(R.id.finding_your_ride_layout)
     CardView finding_your_ride_layout;
     @BindView(R.id.confirm_uber_layout)
@@ -145,7 +153,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             }
         });
 
-        startMapCameraSpinningAnimation(mMap.getCameraPosition().target);
+        startMapCameraSpinningAnimation(origin);
 
     }
 
@@ -165,11 +173,52 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                     .build()));
         });
         animator.start();
+
+        //After start animation, find driver
+        findNearbyDriver(target);
+    }
+
+    private void findNearbyDriver(LatLng target) {
+        if (Common.driverfound.size() > 0) {
+            float min_distance = 0; //default min distance = 0
+            DriverGeoModel foundDriver = Common.driverfound.get(Common.driverfound.keySet()
+                    .iterator().next());//default set first driver is found
+            Location currentRiderLocation = new Location("");
+            currentRiderLocation.setLatitude(target.latitude);
+            currentRiderLocation.setLongitude(target.longitude);
+            for(String key:Common.driverfound.keySet())
+            {
+                Location driverLocation = new Location("");
+                driverLocation.setLatitude(Common.driverfound.get(key).getGeoLocation().latitude);
+                driverLocation.setLongitude(Common.driverfound.get(key).getGeoLocation().longitude);
+
+                //Compare 2 Location
+                if(min_distance == 0)
+                {
+                    min_distance = driverLocation.distanceTo(currentRiderLocation);//first default min_distance
+                    foundDriver = Common.driverfound.get(key);
+                }
+                else if(driverLocation.distanceTo(currentRiderLocation) < min_distance)
+                {
+                    //if have any driver driver smaller min_distance, get all!
+                    min_distance = driverLocation.distanceTo(currentRiderLocation);//first default min_distance
+                    foundDriver = Common.driverfound.get(key);
+                }
+                Snackbar.make(main_layout,new StringBuilder("Found driver: ")
+                .append(foundDriver.getDriverInfoModel().getPhonenumber()),
+                        Snackbar.LENGTH_LONG).show();
+
+            }
+        } else {
+            //Not found
+            Snackbar.make(main_layout, getString(R.string.drivers_not_found), Snackbar.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override
     protected void onDestroy() {
-        if(animator !=null) animator.end();
+        if (animator != null) animator.end();
         super.onDestroy();
     }
 
