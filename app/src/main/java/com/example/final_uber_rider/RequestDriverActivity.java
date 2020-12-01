@@ -18,10 +18,13 @@ import android.widget.Toast;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.final_uber_rider.Callback.Common.Common;
 import com.example.final_uber_rider.Remote.IGoogleAPI;
 import com.example.final_uber_rider.Remote.RetrofitClient;
 import com.example.final_uber_rider.model.DriverGeoModel;
+import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
 import com.example.final_uber_rider.model.EventBus.SelectPlaceEvent;
+import com.example.final_uber_rider.utils.RiderUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,8 +51,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.sql.Driver;
-import java.time.LocalDate;
 import java.util.List;
 
 import butterknife.BindView;
@@ -70,7 +71,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private static final int DESIRED_SECONDS_PER_ONE_FULL_360_SPIN = 40;
     //effects
     private Circle lastUserCircle;
-    private long duration = 1000;
+    private final long duration = 1000;
     private ValueAnimator lastPulseAnimator;
 
     //View
@@ -91,6 +92,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
     @BindView(R.id.fill_map)
     View fill_map;
+    private DriverGeoModel lastDriverCall;
 
 
     @OnClick(R.id.btn_confirm_uber)
@@ -181,38 +183,64 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private void findNearbyDriver(LatLng target) {
         if (Common.driverfound.size() > 0) {
             float min_distance = 0; //default min distance = 0
-            DriverGeoModel foundDriver = Common.driverfound.get(Common.driverfound.keySet()
-                    .iterator().next());//default set first driver is found
+            DriverGeoModel foundDriver = null;
             Location currentRiderLocation = new Location("");
             currentRiderLocation.setLatitude(target.latitude);
             currentRiderLocation.setLongitude(target.longitude);
-            for(String key:Common.driverfound.keySet())
-            {
+
+            for (String key : Common.driverfound.keySet()) {
                 Location driverLocation = new Location("");
                 driverLocation.setLatitude(Common.driverfound.get(key).getGeoLocation().latitude);
                 driverLocation.setLongitude(Common.driverfound.get(key).getGeoLocation().longitude);
 
                 //Compare 2 Location
-                if(min_distance == 0)
-                {
+                if (min_distance == 0) {
+
                     min_distance = driverLocation.distanceTo(currentRiderLocation);//first default min_distance
-                    foundDriver = Common.driverfound.get(key);
-                }
-                else if(driverLocation.distanceTo(currentRiderLocation) < min_distance)
-                {
+
+                    if (!Common.driverfound.get(key).isDecline()) // if not decline before
+                    {
+                        foundDriver = Common.driverfound.get(key);
+                        break; // exit loop because  we found driver
+                    } else
+                        continue; // if already decline before,just skip and continue
+
+                } else if (driverLocation.distanceTo(currentRiderLocation) < min_distance) {
+
                     //if have any driver driver smaller min_distance, get all!
                     min_distance = driverLocation.distanceTo(currentRiderLocation);//first default min_distance
-                    foundDriver = Common.driverfound.get(key);
-                }
-                Snackbar.make(main_layout,new StringBuilder("Found driver: ")
-                .append(foundDriver.getDriverInfoModel().getPhonenumber()),
-                        Snackbar.LENGTH_LONG).show();
 
+                    if (!Common.driverfound.get(key).isDecline()) // if not decline before
+                    {
+                        foundDriver = Common.driverfound.get(key);
+                        break; // exit loop because  we found driver
+                    } else
+                        continue; // if already decline before,just skip and continue
+                }
+//                Founded driver!
+//                Snackbar.make(main_layout, new StringBuilder("Found driver: ")
+//                                .append(foundDriver.getDriverInfoModel().getPhonenumber()),
+//                        Snackbar.LENGTH_LONG).show();
             }
+
+            //after loop,
+            if (foundDriver != null) {
+                RiderUtils.sendRequestToDriver(this, main_layout, foundDriver, target);
+                lastDriverCall = foundDriver;
+
+            } else {
+                Snackbar.make(main_layout, getString(R.string.There_are_no_driver_accpect_request), Snackbar.LENGTH_LONG)
+                        .show();
+                lastDriverCall = null;
+                finish();
+            }
+
         } else {
             //Not found
             Snackbar.make(main_layout, getString(R.string.drivers_not_found), Snackbar.LENGTH_LONG)
                     .show();
+            lastDriverCall = null;
+            finish();
         }
     }
 
@@ -221,6 +249,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         if (animator != null) animator.end();
         super.onDestroy();
     }
+
 
     private void setDataPickup() {
         txt_pickup_adrress.setText(txt_origin != null ? txt_origin.getText() : "None");
@@ -249,7 +278,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private SelectPlaceEvent selectPlaceEvent;
 
     //Routes
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private IGoogleAPI iGoogleAPI;
     private Polyline blackPolyline, greyPolyline;
     private PolylineOptions polylineOptions, blackPolylineOptions;
@@ -258,9 +287,10 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private Marker originMarker, destinationMarker;
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
     }
 
     @Override
@@ -269,12 +299,26 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         super.onStop();
         if (EventBus.getDefault().hasSubscriberForEvent(SelectPlaceEvent.class))
             EventBus.getDefault().removeStickyEvent(SelectPlaceEvent.class);
+
+        if (EventBus.getDefault().hasSubscriberForEvent(DeclineRequestFromDriver.class))
+            EventBus.getDefault().removeStickyEvent(DeclineRequestFromDriver.class);
+
         EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onSelectPlaceEvent(SelectPlaceEvent event) {
         selectPlaceEvent = event;
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onDeclineRequestEvent(DeclineRequestFromDriver event) {
+        if (lastDriverCall != null) {
+            Common.driverfound.get(lastDriverCall.getKey()).setDecline(true);
+
+            //Driver has been declined request, just find a new one
+            findNearbyDriver(selectPlaceEvent.getOrigin());
+        }
     }
 
     @Override
@@ -365,7 +409,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
                         }
                         polylineOptions = new PolylineOptions();
-                        polylineOptions.color(Color.GRAY);
+                        polylineOptions.color(Color.YELLOW);
                         polylineOptions.width(12);
                         polylineOptions.startCap(new SquareCap());
                         polylineOptions.jointType(JointType.ROUND);
@@ -418,7 +462,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                         addDestinationMarker(end_address);
 
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 160));
-                        mMap.moveCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom - 1));
+                        mMap.moveCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom - 2));
 
 
                     } catch (Exception e) {

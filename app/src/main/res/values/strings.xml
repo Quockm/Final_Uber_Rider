@@ -40,4 +40,11 @@
     <string name="demo_address">127/15 le thuc hoach VN</string>
     <string name="meet_driver_here">Meet Driver here</string>
     <string name="finding_your_driver">Finding your Driver</string>
+    <string name="token_not_found">Token Not Found</string>
+    <string name="request_driver_failed">Failed to send request to Driver</string>
+
+    <string name="motaxigo">MotaxiGo</string>
+    <string name="get_in_the_car_and_feel_the_live">Get in the car and enjoy your ride</string>
+    <string name="version">v 0.0.1</string>
+    <string name="There_are_no_driver_accpect_request">There are no driver accpect request</string>
 </resources>

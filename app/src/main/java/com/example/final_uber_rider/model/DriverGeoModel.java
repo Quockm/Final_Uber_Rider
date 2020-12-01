@@ -11,6 +11,7 @@ public class DriverGeoModel {
     private String key;
     private GeoLocation geoLocation;
     private DriverInfoModel driverInfoModel;
+    private boolean isDecline;
 
     public DriverGeoModel() {
     }
@@ -42,5 +43,13 @@ public class DriverGeoModel {
 
     public void setDriverInfoModel(DriverInfoModel driverInfoModel) {
         this.driverInfoModel = driverInfoModel;
+    }
+
+    public boolean isDecline() {
+        return isDecline;
+    }
+
+    public void setDecline(boolean decline) {
+        isDecline = decline;
     }
 }

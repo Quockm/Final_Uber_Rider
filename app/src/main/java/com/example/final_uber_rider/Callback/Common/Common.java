@@ -1,4 +1,4 @@
-package com.example.final_uber_rider;
+package com.example.final_uber_rider.Callback.Common;
 
 import android.animation.ValueAnimator;
 import android.app.Notification;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.core.app.NotificationCompat;
 
+import com.example.final_uber_rider.R;
 import com.example.final_uber_rider.model.AnimationModel;
 import com.example.final_uber_rider.model.DriverGeoModel;
 import com.example.final_uber_rider.model.RiderInfoModel;
@@ -31,6 +32,10 @@ public class Common {
     public static final String RIDER_LOCATION_REFERENCE = "RiderLocation";
     public static final String DRIVER_LOCATION_REFERENCE = "DriverLocation";
     public static final String DRIVER_INFO_REFERENCE = "DriverInfo";
+    public static final String REQUEST_DRIVER_TITLE = "RequestDriver";
+    public static final String RIDER_PICKUP_LOCATION = "PickupLocation";
+    public static final String RIDER_KEY = "RiderKey" ;
+    public static final String REQUEST_DRIVER_DECLINE = "Decline";
 
     public static RiderInfoModel currentRider;
 
@@ -43,7 +48,7 @@ public class Common {
 
 
     public static String buildWelcomeMessage() {
-        if (Common.currentRider != null) {
+        if (Common.currentRider != null ) {
             return new StringBuilder("Welcome ")
                     .append(Common.currentRider.getFisrtnasme())
                     .append(" ")

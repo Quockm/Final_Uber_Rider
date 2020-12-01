@@ -2,11 +2,13 @@ package com.example.final_uber_rider.service;
 
 import androidx.annotation.NonNull;
 
-import com.example.final_uber_rider.Common;
+import com.example.final_uber_rider.Callback.Common.Common;
+import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
 import com.example.final_uber_rider.utils.RiderUtils;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.RemoteMessage;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Map;
 import java.util.Random;
@@ -29,10 +31,16 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         super.onMessageReceived(remoteMessage);
         Map<String, String> dataRev = remoteMessage.getData();
         if (dataRev != null) {
-            Common.ShowNofication(this, new Random().nextInt(),
-                    dataRev.get(Common.NOTI_TITLE),
-                    dataRev.get(Common.NOTI_CONTENT),
-                    null);
+            if (dataRev.get(Common.NOTI_TITLE) != null) {
+                if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE)) {
+                    EventBus.getDefault().postSticky(new DeclineRequestFromDriver());
+                } else
+                    Common.ShowNofication(this, new Random().nextInt(),
+                            dataRev.get(Common.NOTI_TITLE),
+                            dataRev.get(Common.NOTI_CONTENT),
+                            null);
+            }
         }
+
     }
 }

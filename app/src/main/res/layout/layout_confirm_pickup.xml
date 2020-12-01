@@ -54,9 +54,9 @@
                 android:id="@+id/btn_confirm_pickup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/black"
+                android:background="@drawable/custom_button"
                 android:text="@string/confitm_pickup_spot"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/black" />
         </LinearLayout>
 
 

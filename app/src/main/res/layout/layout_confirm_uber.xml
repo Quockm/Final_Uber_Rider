@@ -7,62 +7,136 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:weightSum="2">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:fontFamily="@font/uber_move_bold"
+            android:padding="16dp"
+            android:text="This will take you:"
+            android:textColor="#737373"
+            android:textSize="30sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingLeft="@dimen/activity_margin"
-            android:paddingTop="8dp"
-            android:paddingRight="@dimen/activity_margin"
-            android:paddingBottom="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="32dp"
-                android:layout_marginRight="32dp"
-                android:src="@drawable/ic_baseline_money_24"
-                android:tint="#737373"
-                tools:ignore="UseAppTint" />
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/pay_by_cash"
+                android:layout_weight="1"
+                android:drawableStart="@drawable/ic_baseline_location_on_24"
+                android:drawableLeft="@drawable/ic_baseline_location_on_24"
+                android:padding="16dp"
+                android:text=" Your Trip: 2.4km"
                 android:textColor="#737373"
                 android:textSize="16sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:drawableStart="@drawable/ic_baseline_attach_money_24"
+                android:drawableLeft="@drawable/ic_baseline_attach_money_24"
+                android:padding="16dp"
+                android:text="The Fee: 12.24$"
+                android:textColor="#737373"
+                android:textSize="16sp" />
         </LinearLayout>
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:weightSum="2"-->
+<!--            android:orientation="horizontal">-->
+
+
+<!--            <ImageView-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="100dp"-->
+<!--                android:src="@drawable/baby_car"/>-->
+
+<!--            <ImageView-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="100dp"-->
+<!--                android:src="@drawable/limousine"/>-->
+
+
+<!--        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingLeft="@dimen/activity_margin"
-            android:paddingTop="8dp"
-            android:paddingRight="@dimen/activity_margin"
+            android:orientation="vertical"
             android:paddingBottom="8dp">
 
-            <Button
-                android:id="@+id/btn_confirm_uber"
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/black"
-                android:text="@string/confirm_uber"
-                android:textColor="@android:color/white" />
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_margin"
+                android:paddingTop="8dp"
+                android:paddingRight="@dimen/activity_margin"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginRight="32dp"
+                    android:src="@drawable/ic_baseline_money_24"
+                    android:tint="#737373"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/pay_by_cash"
+                    android:textColor="#737373"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_margin"
+                android:paddingTop="8dp"
+                android:paddingRight="@dimen/activity_margin"
+                android:paddingBottom="8dp">
+
+                <Button
+                    android:id="@+id/btn_confirm_uber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/custom_button"
+                    android:text="@string/confirm_uber"
+                    android:textColor="@android:color/black" />
+            </LinearLayout>
         </LinearLayout>
+
+
     </LinearLayout>
+
+
 
 
 </androidx.cardview.widget.CardView>
