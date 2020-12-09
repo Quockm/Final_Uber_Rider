@@ -36,6 +36,9 @@ public class Common {
     public static final String RIDER_PICKUP_LOCATION = "PickupLocation";
     public static final String RIDER_KEY = "RiderKey" ;
     public static final String REQUEST_DRIVER_DECLINE = "Decline";
+    public static final String RIDER_PICKUP_LOCATION_STRING = "PickupLocationString";
+    public static final String RIDER_DESTINATION_STRING = "DestinationLocationString";
+    public static final String RIDER_DESTINATION = "DestinationLocation";
 
     public static RiderInfoModel currentRider;
 

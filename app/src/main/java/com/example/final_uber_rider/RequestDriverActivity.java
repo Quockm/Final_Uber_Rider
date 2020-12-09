@@ -135,19 +135,19 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 .icon(BitmapDescriptorFactory.defaultMarker())
                 .position(selectPlaceEvent.getOrigin()));
 
-        addPulsatingEffect(selectPlaceEvent.getOrigin());
+        addPulsatingEffect(selectPlaceEvent);
     }
 
-    private void addPulsatingEffect(LatLng origin) {
+    private void addPulsatingEffect(SelectPlaceEvent selectPlaceEvent) {
         if (lastPulseAnimator != null) lastPulseAnimator.cancel();
-        if (lastUserCircle != null) lastUserCircle.setCenter(origin);
+        if (lastUserCircle != null) lastUserCircle.setCenter(selectPlaceEvent.getOrigin());
 
         lastPulseAnimator = Common.valueAnimate(duration, animation -> {
             if (lastUserCircle != null)
                 lastUserCircle.setRadius((Float) animation.getAnimatedValue());
             else {
                 lastUserCircle = mMap.addCircle(new CircleOptions()
-                        .center(origin)
+                        .center(selectPlaceEvent.getOrigin())
                         .radius((Float) animation.getAnimatedValue())
                         .strokeColor(Color.WHITE)
                         .fillColor(Color.parseColor("#33333333"))
@@ -155,11 +155,11 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             }
         });
 
-        startMapCameraSpinningAnimation(origin);
+        startMapCameraSpinningAnimation(selectPlaceEvent);
 
     }
 
-    private void startMapCameraSpinningAnimation(LatLng target) {
+    private void startMapCameraSpinningAnimation(SelectPlaceEvent selectPlaceEvent) {
         if (animator != null) animator.cancel();
         animator = ValueAnimator.ofFloat(0, DESIRED_NUM_OF_SPINS * 360);
         animator.setDuration(DESIRED_SECONDS_PER_ONE_FULL_360_SPIN * DESIRED_NUM_OF_SPINS * 1000);
@@ -168,7 +168,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         animator.addUpdateListener(valueAnimator -> {
             Float newBearingValue = (Float) valueAnimator.getAnimatedValue();
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-                    .target(target)
+                    .target(selectPlaceEvent.getOrigin())
                     .zoom(16f)
                     .tilt(45f)
                     .bearing(newBearingValue)
@@ -177,18 +177,20 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         animator.start();
 
         //After start animation, find driver
-        findNearbyDriver(target);
+        findNearbyDriver(selectPlaceEvent);
     }
 
-    private void findNearbyDriver(LatLng target) {
+    private void findNearbyDriver(SelectPlaceEvent selectPlaceEvent) {
         if (Common.driverfound.size() > 0) {
+
             float min_distance = 0; //default min distance = 0
             DriverGeoModel foundDriver = null;
             Location currentRiderLocation = new Location("");
-            currentRiderLocation.setLatitude(target.latitude);
-            currentRiderLocation.setLongitude(target.longitude);
+            currentRiderLocation.setLatitude(selectPlaceEvent.getOrigin().latitude);
+            currentRiderLocation.setLongitude(selectPlaceEvent.getOrigin().longitude);
 
-            for (String key : Common.driverfound.keySet()) {
+            for (String key : Common.driverfound.keySet())
+            {
                 Location driverLocation = new Location("");
                 driverLocation.setLatitude(Common.driverfound.get(key).getGeoLocation().latitude);
                 driverLocation.setLongitude(Common.driverfound.get(key).getGeoLocation().longitude);
@@ -216,25 +218,24 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                         break; // exit loop because  we found driver
                     } else
                         continue; // if already decline before,just skip and continue
-                }
+
 //                Founded driver!
 //                Snackbar.make(main_layout, new StringBuilder("Found driver: ")
 //                                .append(foundDriver.getDriverInfoModel().getPhonenumber()),
 //                        Snackbar.LENGTH_LONG).show();
+                }
             }
-
             //after loop,
             if (foundDriver != null) {
-                RiderUtils.sendRequestToDriver(this, main_layout, foundDriver, target);
+                RiderUtils.sendRequestToDriver(this, main_layout, foundDriver, selectPlaceEvent);
                 lastDriverCall = foundDriver;
 
             } else {
-                Snackbar.make(main_layout, getString(R.string.There_are_no_driver_accpect_request), Snackbar.LENGTH_LONG)
+                Toast.makeText(this, getString(R.string.There_are_no_driver_accpect_request), Toast.LENGTH_LONG)
                         .show();
                 lastDriverCall = null;
                 finish();
             }
-
         } else {
             //Not found
             Snackbar.make(main_layout, getString(R.string.drivers_not_found), Snackbar.LENGTH_LONG)
@@ -317,7 +318,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             Common.driverfound.get(lastDriverCall.getKey()).setDecline(true);
 
             //Driver has been declined request, just find a new one
-            findNearbyDriver(selectPlaceEvent.getOrigin());
+            findNearbyDriver(selectPlaceEvent);
         }
     }
 

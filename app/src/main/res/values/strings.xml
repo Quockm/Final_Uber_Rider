@@ -23,7 +23,7 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="title_activity_rider_home">RiderHomeActivity</string>
-    <string name="permisson_require" />
+    <string name="permisson_require">Location permission Require</string>
     <string name="drivers_not_found">Driver not found</string>
     <string name="key_no_found"> Key not found</string>
     <string name="wellcome">Wellcome</string>

@@ -179,13 +179,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
 
-
-
         //Obtain the SupportMapFragment and get notified when the map is ready to used
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
         initView(root);
         init();
+
+
         return root;
     }
 
@@ -226,6 +228,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
         });
         super.onResume();
     }
+
 
     private void registerOnlineSystem() {
         onlineRef.addValueEventListener(onlineValueListener);
@@ -280,41 +283,42 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
         iFirebaseDriverInfoListener = this;
         iFireFailedListener = this;
 
-        onlineRef = FirebaseDatabase.getInstance().getReference().child(".info/connected");
-        riderLocationRef = FirebaseDatabase.getInstance().getReference(Common.RIDER_LOCATION_REFERENCE);
-        currentRiderRef = FirebaseDatabase.getInstance().getReference(Common.RIDER_LOCATION_REFERENCE)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        geoFire = new GeoFire(riderLocationRef);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            Snackbar.make(mapFragment.getView(), R.string.permisson_require, Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
+//        onlineRef = FirebaseDatabase.getInstance().getReference().child(".info/connected");
+//        riderLocationRef = FirebaseDatabase.getInstance().getReference(Common.RIDER_LOCATION_REFERENCE);
+//        currentRiderRef = FirebaseDatabase.getInstance().getReference(Common.RIDER_LOCATION_REFERENCE)
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//        geoFire = new GeoFire(riderLocationRef);
 
         buildLocationRequest();
 
         buildLocationCallback();
 
         updateLocation();
+
         //load end all driver
         loadAvaiableDrivers();
 
     }
 
     private void updateLocation() {
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
     }
 
     private void buildLocationCallback() {
-        if(locationCallback == null)
-        {
+        if (locationCallback == null) {
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -363,8 +367,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
     }
 
     private void buildLocationRequest() {
-        if(locationRequest == null)
-        {
+        if (locationRequest == null) {
             locationRequest = new LocationRequest();
             locationRequest.setSmallestDisplacement(10f);
             locationRequest.setInterval(5000);
@@ -422,8 +425,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                                 @Override
                                 public void onKeyEntered(String key, GeoLocation location) {
                                     //Common.driverfound.add(new DriverGeoModel(key, location));
-                                    if(!Common.driverfound.containsKey(key))
-                                        Common.driverfound.put(key,new DriverGeoModel(key,location));//add if it not exists
+                                    if (!Common.driverfound.containsKey(key))
+                                        Common.driverfound.put(key, new DriverGeoModel(key, location));//add if it not exists
 
                                 }
 
@@ -650,9 +653,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                     if (!snapshot.hasChildren()) {
                         if (Common.makerList.get(driverGeoModel.getKey()) != null)
                             Common.makerList.get(driverGeoModel.getKey()).remove();//remove makers
+
                         Common.makerList.remove(driverGeoModel.getKey());//remove marker info from hash map
                         Common.driverLocationSubcribe.remove(driverGeoModel.getKey());//remove driver information
+
+                        if (Common.driverfound != null && Common.driverfound.size() > 0) // remove local information of Driver
+                            Common.driverfound.remove(driverGeoModel.getKey());
+
                         drivelocation.removeEventListener(this);// remove eventListener
+
                     } else {
                         if (Common.makerList.get(driverGeoModel.getKey()) != null) {
                             GeoQueryModel geoQueryModel = snapshot.getValue(GeoQueryModel.class);
@@ -702,7 +711,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
             compositeDisposable.add(iGoogleAPI.getDirections("driving",
                     "less_driving",
                     from, to,
-                    getString(R.string.google_api_key))
+                    getActivity().getString(R.string.google_api_key))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(returnResult -> {
