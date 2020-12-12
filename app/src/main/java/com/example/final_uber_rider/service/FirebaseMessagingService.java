@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.example.final_uber_rider.Callback.Common.Common;
 import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
+import com.example.final_uber_rider.model.EventBus.DriverAcceptTripEvent;
 import com.example.final_uber_rider.utils.RiderUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.RemoteMessage;
@@ -34,6 +35,12 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             if (dataRev.get(Common.NOTI_TITLE) != null) {
                 if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE)) {
                     EventBus.getDefault().postSticky(new DeclineRequestFromDriver());
+                }
+
+                else if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_ACCEPT)) {
+
+                    String tripKey = dataRev.get(Common.TRIP_KEY);
+                    EventBus.getDefault().postSticky(new DriverAcceptTripEvent(tripKey));
                 } else
                     Common.ShowNofication(this, new Random().nextInt(),
                             dataRev.get(Common.NOTI_TITLE),

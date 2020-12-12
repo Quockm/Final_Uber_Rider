@@ -153,6 +153,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
         super.onStop();
     }
 
+
     //Online system
     DatabaseReference onlineRef, currentRiderRef, riderLocationRef;
     GeoFire geoFire;
@@ -207,25 +208,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
 
     @Override
     public void onResume() {
-        registerOnlineSystem();
-        geoFire.getLocation("new location", new com.firebase.geofire.LocationCallback() {
-            @Override
-            public void onLocationResult(String key, GeoLocation location) {
-                if (location != null) {
-                    //set marker to display on map
-                    FirebaseAuth.getInstance().getCurrentUser().getUid();
-                } else {
-                    //When location is null
-                    //Toast.makeText(getContext(), "Error",Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
-
-            }
-        });
         super.onResume();
     }
 
@@ -250,13 +233,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                 //Snackbar.make(getView(), "" + place.getLatLng(), Snackbar.LENGTH_LONG).show();
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
+
                     return;
                 }
                 fusedLocationProviderClient.getLastLocation()
@@ -291,11 +268,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
             return;
         }
 
-//        onlineRef = FirebaseDatabase.getInstance().getReference().child(".info/connected");
-//        riderLocationRef = FirebaseDatabase.getInstance().getReference(Common.RIDER_LOCATION_REFERENCE);
-//        currentRiderRef = FirebaseDatabase.getInstance().getReference(Common.RIDER_LOCATION_REFERENCE)
-//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-//        geoFire = new GeoFire(riderLocationRef);
 
         buildLocationRequest();
 
@@ -345,22 +317,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                         // do nothing
                     }
 
-                    //update Location
-                    geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                            new GeoLocation(locationResult.getLastLocation().getLatitude(),
-                                    locationResult.getLastLocation().getLongitude()),
-                            (key, error) -> {
-                                if (error != null)
-                                    Snackbar.make(mapFragment.getView(), error.getMessage(), Snackbar.LENGTH_LONG)
-                                            .show();
-//                            else {
-//                                if (isFirstTime) {
-//                                    Snackbar.make(mapFragment.getView(), "You're Online", Snackbar.LENGTH_LONG)
-//                                            .show();
-//                                    isFirstTime = false;
-//                                }
-//                            }
-                            });
+
                 }
             };
         }
@@ -391,13 +348,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
     private void loadAvaiableDrivers() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return;
         }
         fusedLocationProviderClient.getLastLocation()
@@ -410,7 +361,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                     try {
                         addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                         if (addressList.size() > 0)
-                            cityname = addressList.get(0).getLocality();
+                            cityname = addressList.get(0).getSubAdminArea();
                         if (!TextUtils.isEmpty(cityname)) {
                             //Query
                             DatabaseReference driver_location_ref = FirebaseDatabase.getInstance()
@@ -725,15 +676,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                                         JSONObject route = jsonArray.getJSONObject(i);
                                         JSONObject poly = route.getJSONObject("overview_polyline");
                                         String polyline = poly.getString("points");
-                                        //polylinelist = Common.decodePoly(polyline);
+
                                         animationModel.setPolylineList(Common.decodePoly(polyline));
 
                                     }
 
                                     //moving
                                     handler = new Handler();
-//                            index = -1;
-//                            next = 1;
 
                                     animationModel.setIndex(-1);
                                     animationModel.setNext(1);
@@ -743,10 +692,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                                             if (animationModel.getPolylineList() != null &&
                                                     animationModel.getPolylineList().size() > 1) {
                                                 if (animationModel.getIndex() < animationModel.getPolylineList().size() - 2) {
-//                                            index++;
-//                                            next = index + 1;
-//                                            start = animationModel.getPolylineList().get(index);
-//                                            end = animationModel.getPolylineList().get(next);
+
                                                     animationModel.setIndex(animationModel.getIndex() + 1);
                                                     animationModel.setNext(animationModel.getIndex() + 1);
                                                     animationModel.setStart(animationModel.getPolylineList().get(animationModel.getIndex()));
@@ -757,13 +703,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                                                 valueAnimator.setDuration(3000);
                                                 valueAnimator.setInterpolator(new LinearInterpolator());
                                                 valueAnimator.addUpdateListener(value -> {
-//                                            v = value.getAnimatedFraction();
-//                                            lat = v * end.latitude + (1 - v) * start.latitude;
-//                                            lng = v * end.longitude + (1 - v) * start.longitude;
-//                                            LatLng newPos = new LatLng(lat, lng);
-//                                            currentMarker.setPosition(newPos);
-//                                            currentMarker.setAnchor(0.5f, 0.5f);
-//                                            currentMarker.setRotation(Common.getBearing(start, newPos));
+
                                                     animationModel.setV(value.getAnimatedFraction());
                                                     animationModel.setLat(animationModel.getV() * animationModel.getEnd().latitude
                                                             + (1 - animationModel.getV()) * animationModel.getStart().latitude);

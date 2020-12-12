@@ -39,6 +39,9 @@ public class Common {
     public static final String RIDER_PICKUP_LOCATION_STRING = "PickupLocationString";
     public static final String RIDER_DESTINATION_STRING = "DestinationLocationString";
     public static final String RIDER_DESTINATION = "DestinationLocation";
+    public static final String REQUEST_DRIVER_ACCEPT = "Accept" ;
+    public static final String TRIP_KEY = "TripKey";
+    public static final String TRIP = "Trips";
 
     public static RiderInfoModel currentRider;
 

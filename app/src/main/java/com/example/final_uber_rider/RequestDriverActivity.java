@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentActivity;
 
@@ -23,7 +24,9 @@ import com.example.final_uber_rider.Remote.IGoogleAPI;
 import com.example.final_uber_rider.Remote.RetrofitClient;
 import com.example.final_uber_rider.model.DriverGeoModel;
 import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
+import com.example.final_uber_rider.model.EventBus.DriverAcceptTripEvent;
 import com.example.final_uber_rider.model.EventBus.SelectPlaceEvent;
+import com.example.final_uber_rider.model.TripPlanModel;
 import com.example.final_uber_rider.utils.RiderUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,11 +46,16 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.SquareCap;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -189,8 +197,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             currentRiderLocation.setLatitude(selectPlaceEvent.getOrigin().latitude);
             currentRiderLocation.setLongitude(selectPlaceEvent.getOrigin().longitude);
 
-            for (String key : Common.driverfound.keySet())
-            {
+            for (String key : Common.driverfound.keySet()) {
                 Location driverLocation = new Location("");
                 driverLocation.setLatitude(Common.driverfound.get(key).getGeoLocation().latitude);
                 driverLocation.setLongitude(Common.driverfound.get(key).getGeoLocation().longitude);
@@ -304,7 +311,47 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         if (EventBus.getDefault().hasSubscriberForEvent(DeclineRequestFromDriver.class))
             EventBus.getDefault().removeStickyEvent(DeclineRequestFromDriver.class);
 
+        if (EventBus.getDefault().hasSubscriberForEvent(DriverAcceptTripEvent.class))
+            EventBus.getDefault().removeStickyEvent(DriverAcceptTripEvent.class);
+
         EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onDriverAcceptEvent(DriverAcceptTripEvent event) {
+
+
+        //Get Trip Information
+        FirebaseDatabase.getInstance().getReference(Common.TRIP)
+                .child(event.getTripIp())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            TripPlanModel tripPlanModel = snapshot.getValue(TripPlanModel.class);
+                            mMap.clear();
+                            fill_map.setVisibility(View.GONE);
+                            if(animator != null) animator.end();
+                            CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(mMap.getCameraPosition().target)
+                                    .tilt(0f)
+                                    .zoom(mMap.getCameraPosition().zoom)
+                                    .build();
+                            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                            Toast.makeText(RequestDriverActivity.this,"Driver Accpet" +tripPlanModel.getDriverInfoModel().getFisrtnasme()
+                            ,Toast.LENGTH_LONG).show();
+
+                        } else
+                            Snackbar.make(main_layout, getString(R.string.trip_not_found) + event.getTripIp(),
+                                    Snackbar.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                        Snackbar.make(main_layout, error.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
