@@ -98,6 +98,11 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     @BindView(R.id.txt_pickup_adrress)
     TextView txt_pickup_adrress;
 
+    @BindView(R.id.txt_distance_trip)
+    TextView txt_distance_trip;
+    @BindView(R.id.txt_trip_fee)
+    TextView txt_trip_fee;
+
     @BindView(R.id.fill_map)
     View fill_map;
     private DriverGeoModel lastDriverCall;
@@ -191,6 +196,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     private void findNearbyDriver(SelectPlaceEvent selectPlaceEvent) {
         if (Common.driverfound.size() > 0) {
 
+            Log.d("Nhi_Request", "Driver list size: " + Common.driverfound.size());
+
             float min_distance = 0; //default min distance = 0
             DriverGeoModel foundDriver = null;
             Location currentRiderLocation = new Location("");
@@ -198,6 +205,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             currentRiderLocation.setLongitude(selectPlaceEvent.getOrigin().longitude);
 
             for (String key : Common.driverfound.keySet()) {
+                Log.e("Nhi_Request", key);
                 Location driverLocation = new Location("");
                 driverLocation.setLatitude(Common.driverfound.get(key).getGeoLocation().latitude);
                 driverLocation.setLongitude(Common.driverfound.get(key).getGeoLocation().longitude);
@@ -211,8 +219,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                     {
                         foundDriver = Common.driverfound.get(key);
                         break; // exit loop because  we found driver
-                    } else
-                        continue; // if already decline before,just skip and continue
+                    } /*else
+                        continue;*/ // if already decline before,just skip and continue
 
                 } else if (driverLocation.distanceTo(currentRiderLocation) < min_distance) {
 
@@ -223,8 +231,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                     {
                         foundDriver = Common.driverfound.get(key);
                         break; // exit loop because  we found driver
-                    } else
-                        continue; // if already decline before,just skip and continue
+                    }/* else
+                        continue; */// if already decline before,just skip and continue
 
 //                Founded driver!
 //                Snackbar.make(main_layout, new StringBuilder("Found driver: ")
@@ -244,6 +252,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 finish();
             }
         } else {
+            Log.e("Nhi_Request", "Driver list is EMPTY");
             //Not found
             Snackbar.make(main_layout, getString(R.string.drivers_not_found), Snackbar.LENGTH_LONG)
                     .show();
@@ -373,12 +382,13 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_driver);
+        init();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        init();
+
     }
 
     private void init() {
@@ -511,6 +521,20 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 160));
                         mMap.moveCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom - 2));
+
+                        String tripDistanceText, tripFeeText;
+                        double distanceValue ,tripFeeValue;
+                        tripDistanceText = "Your Trip: " + legObjects.getJSONObject("distance").getString("text");
+                        distanceValue = legObjects.getJSONObject("distance").getDouble("value");
+
+                        tripFeeValue = (distanceValue / 1000) * 15000;
+                        tripFeeText = "The Fee: " + Common.formatDecimal( tripFeeValue, "#,##0d",
+                                '.', ',' );
+
+                        if (txt_distance_trip != null && txt_trip_fee != null){
+                            txt_distance_trip.setText(tripDistanceText);
+                            txt_trip_fee.setText(tripFeeText);
+                        }
 
 
                     } catch (Exception e) {

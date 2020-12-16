@@ -21,10 +21,13 @@ import com.example.final_uber_rider.model.RiderInfoModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Common {
@@ -171,6 +174,16 @@ public class Common {
     public static String formatAdrress(String start_address) {
         int firstIndexOfComma = start_address.indexOf(",");
         return start_address.substring(0,firstIndexOfComma); // get only address
+    }
+
+    public static String formatDecimal(double value, String formPattern,
+                                       char decimalSeparator, char groupingSeparator){
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        symbols.setDecimalSeparator(decimalSeparator);
+        symbols.setGroupingSeparator(groupingSeparator);
+
+        DecimalFormat decimalFormat = new DecimalFormat(formPattern, symbols);
+        return decimalFormat.format(value);
     }
 
     public static ValueAnimator valueAnimate(long duration, ValueAnimator.AnimatorUpdateListener listener){
