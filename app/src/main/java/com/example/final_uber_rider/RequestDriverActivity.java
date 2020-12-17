@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.final_uber_rider.Callback.Common.Common;
 import com.example.final_uber_rider.Remote.IGoogleAPI;
 import com.example.final_uber_rider.Remote.RetrofitClient;
@@ -102,6 +104,13 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     TextView txt_distance_trip;
     @BindView(R.id.txt_trip_fee)
     TextView txt_trip_fee;
+
+    @BindView(R.id.driver_info_layout)
+    CardView driver_info_layout;
+    @BindView(R.id.txt_driver_name)
+    TextView driver_name;
+    @BindView(R.id.img_driver)
+    ImageView img_driver;
 
     @BindView(R.id.fill_map)
     View fill_map;
@@ -348,6 +357,16 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                     .build();
                             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+
+                            //Load driver avatar
+                            Glide.with(RequestDriverActivity.this)
+                                    .load(tripPlanModel.getDriverInfoModel().getAvatar())
+                                    .into(img_driver);
+                            driver_name.setText(tripPlanModel.getDriverInfoModel().getFisrtnasme());
+
+                            confirm_pickup_layout.setVisibility(View.GONE);
+                            confirm_uber_layout.setVisibility(View.GONE);
+                            driver_info_layout.setVisibility(View.VISIBLE);
                             Toast.makeText(RequestDriverActivity.this,"Driver Accpet" +tripPlanModel.getDriverInfoModel().getFisrtnasme()
                             ,Toast.LENGTH_LONG).show();
 

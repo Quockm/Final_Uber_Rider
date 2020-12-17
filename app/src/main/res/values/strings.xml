@@ -48,4 +48,9 @@
     <string name="version">v 0.0.1</string>
     <string name="There_are_no_driver_accpect_request">There are no driver accpect request</string>
     <string name="trip_not_found">Trip not found</string>
+    <string name="car_type">Kia Morning</string>
+    <string name="car_number">59F-65-12912</string>
+    <string name="driver_name">Hermes Khong</string>
+    <string name="ascii_dot">■</string>
+    <string name="know">Knows English</string>
 </resources>

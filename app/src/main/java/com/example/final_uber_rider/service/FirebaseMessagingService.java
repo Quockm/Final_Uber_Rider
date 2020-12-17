@@ -1,5 +1,7 @@
 package com.example.final_uber_rider.service;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.final_uber_rider.Callback.Common.Common;
@@ -34,6 +36,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         if (dataRev != null) {
             if (dataRev.get(Common.NOTI_TITLE) != null) {
                 if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE)) {
+                    Log.d("BBB","Send Request");
+
                     EventBus.getDefault().postSticky(new DeclineRequestFromDriver());
                 }
 

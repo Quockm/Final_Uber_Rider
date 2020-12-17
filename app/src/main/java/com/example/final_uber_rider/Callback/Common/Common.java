@@ -49,6 +49,8 @@ public class Common {
     public static RiderInfoModel currentRider;
 
     public static final String TOKEN_REFERENCE = "Token";
+    public static final String TOKEN_RIDER_REFERENCE = "Token_Rider";
+
     public static final String NOTI_TITLE = "Title";
     public static final String NOTI_CONTENT = "body";
     public static Map<String,DriverGeoModel> driverfound = new HashMap<>();
@@ -189,7 +191,7 @@ public class Common {
     public static ValueAnimator valueAnimate(long duration, ValueAnimator.AnimatorUpdateListener listener){
         ValueAnimator va = ValueAnimator.ofFloat(0, 100);
         va.setDuration(duration);
-        va.addUpdateListener(listener);
+        va.addUpdateListener(listener); 
         va.setRepeatCount(ValueAnimator.INFINITE);
         va.setRepeatMode(ValueAnimator.RESTART);
 

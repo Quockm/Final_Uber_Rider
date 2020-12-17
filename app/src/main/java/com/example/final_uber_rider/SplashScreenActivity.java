@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.final_uber_rider.Callback.Common.Common;
 import com.example.final_uber_rider.model.RiderInfoModel;
+import com.example.final_uber_rider.utils.RiderUtils;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -105,8 +106,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                         .getInstanceId()
                         .addOnFailureListener(e -> Toast.makeText(SplashScreenActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show())
                         .addOnSuccessListener(instanceIdResult -> {
-                            Log.d("TOKEN",instanceIdResult.getToken());
-                            //UserUtils.updateToken(SplashScreenActivity.this,instanceIdResult.getToken());
+                            //Log.d("TOKEN",instanceIdResult.getToxken());
+                            RiderUtils.updateToken(SplashScreenActivity.this,instanceIdResult.getToken());
                         });
                 checkUserFromFirebase();
                 //Toast.makeText(SplashScreenActivity.this, "Welcome:" + FirebaseAuth.getInstance().getCurrentUser().getUid(), Toast.LENGTH_LONG).show(); // change the toast
