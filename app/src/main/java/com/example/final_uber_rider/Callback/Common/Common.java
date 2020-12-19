@@ -56,7 +56,7 @@ public class Common {
     public static RiderInfoModel currentRider;
 
     public static final String TOKEN_REFERENCE = "Token";
-    //public static final String TOKEN_RIDER_REFERENCE = "Token_Rider";
+    public static final String TOKEN_RIDER_REFERENCE = "Token_Rider";
     public static final String REQUEST_DRIVER_DECLINE_AND_REMOVE = "DeclineAndRemoveTrip";
 
 

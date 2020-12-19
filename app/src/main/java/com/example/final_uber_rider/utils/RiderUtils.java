@@ -44,8 +44,8 @@ public class RiderUtils {
     public static void updateToken(Context context, String token) {
         TokenModel tokenModel = new TokenModel(token);
         FirebaseDatabase.getInstance()
-                //.getReference(Common.TOKEN_RIDER_REFERENCE)
-                .getReference(Common.TOKEN_REFERENCE)
+                .getReference(Common.TOKEN_RIDER_REFERENCE)
+                //.getReference(Common.TOKEN_REFERENCE)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .setValue(tokenModel)
                 .addOnFailureListener(e -> Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show())
