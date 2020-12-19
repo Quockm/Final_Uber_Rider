@@ -9,9 +9,10 @@
             android:icon="@drawable/ic_baseline_home_24"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/Your_Trip"
+            android:id="@+id/nav_history"
             android:icon="@drawable/ic_baseline_history_24"
             android:title="@string/history" />
+
         <item
             android:id="@+id/help"
             android:icon="@drawable/ic_baseline_help_24"

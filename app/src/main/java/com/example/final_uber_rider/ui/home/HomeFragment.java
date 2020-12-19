@@ -200,9 +200,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
     @Override
     public void onDestroy() {
         super.onDestroy();
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        //geoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        onlineRef.removeEventListener(onlineValueListener);
+        try {
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            //geoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            onlineRef.removeEventListener(onlineValueListener);
+        }catch (Exception e){
+            Log.e("HomeFrag", e.getClass() + ": " + e.getMessage());
+        }
     }
 
     @Override

@@ -8,6 +8,14 @@ public class RiderInfoModel {
     public RiderInfoModel() {
     }
 
+    public RiderInfoModel(String fisrtnasme, String lastname, String phonenumber, String avatar, double rating) {
+        this.fisrtnasme = fisrtnasme;
+        this.lastname = lastname;
+        this.phonenumber = phonenumber;
+        this.avatar = avatar;
+        this.rating = rating;
+    }
+
     public String getFisrtnasme() {
         return fisrtnasme;
     }
