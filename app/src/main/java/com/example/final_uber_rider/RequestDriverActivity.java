@@ -1,13 +1,11 @@
 package com.example.final_uber_rider;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -28,6 +26,7 @@ import com.example.final_uber_rider.Callback.Common.Common;
 import com.example.final_uber_rider.Remote.IGoogleAPI;
 import com.example.final_uber_rider.Remote.RetrofitClient;
 import com.example.final_uber_rider.model.DriverGeoModel;
+import com.example.final_uber_rider.model.EventBus.DeclineRequestAndRemoveTripFromDriver;
 import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
 import com.example.final_uber_rider.model.EventBus.DriverAcceptTripEvent;
 import com.example.final_uber_rider.model.EventBus.SelectPlaceEvent;
@@ -285,7 +284,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         super.onDestroy();
     }
 
-
     private void setDataPickup() {
         txt_pickup_adrress.setText(txt_origin != null ? txt_origin.getText() : "None");
         mMap.clear(); /// clear all on map
@@ -340,6 +338,9 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
         if (EventBus.getDefault().hasSubscriberForEvent(DriverAcceptTripEvent.class))
             EventBus.getDefault().removeStickyEvent(DriverAcceptTripEvent.class);
+
+        if (EventBus.getDefault().hasSubscriberForEvent(DeclineRequestAndRemoveTripFromDriver.class))
+            EventBus.getDefault().removeStickyEvent(DeclineRequestAndRemoveTripFromDriver.class);
 
         EventBus.getDefault().unregister(this);
     }
@@ -416,6 +417,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                             JSONObject distanceEstimate = legObjects.getJSONObject("distance");
                                             String distance = distanceEstimate.getString("text");
 
+
+
                                             LatLng origin = new LatLng(
                                                     Double.parseDouble(tripPlanModel.getOrigin().split(",")[0]),
                                                     Double.parseDouble(tripPlanModel.getOrigin().split(",")[1]));
@@ -428,6 +431,8 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                                     .include(origin)
                                                     .include(destination)
                                                     .build();
+
+
 
                                             addPickupMarkerWithDuration(duration, origin);
                                             addDriverMarker(destination);
@@ -481,12 +486,12 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        TripPlanModel newdata = snapshot.getValue(TripPlanModel.class);
+                        TripPlanModel newData = snapshot.getValue(TripPlanModel.class);
 
                         String driverNewLocation = new StringBuilder()
-                                .append(newdata.getCurrentLat())
+                                .append(newData.getCurrentLat())
                                 .append(",")
-                                .append(newdata.getCurrentLng())
+                                .append(newData.getCurrentLng())
                                 .toString();
 
                         if (!driverOldPosition.equals(driverNewLocation)) // if not equal
@@ -503,7 +508,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
     }
 
     private void moveMarkerAnimation(Marker marker, String from, String to) {
-        //request an api
         compositeDisposable.add(iGoogleAPI.getDirections("driving",
                 "less_driving",
                 from, to,
@@ -511,7 +515,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(returnResult -> {
-                    Log.d("API_RETURN", returnResult);
 
                     try {
                         //parse json
@@ -521,34 +524,12 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                             JSONObject route = jsonArray.getJSONObject(i);
                             JSONObject poly = route.getJSONObject("overview_polyline");
                             String polyline = poly.getString("points");
+
                             polylineList = Common.decodePoly(polyline);
                         }
 
-                        blackPolylineOptions = new PolylineOptions();
-                        blackPolylineOptions.color(Color.BLACK);
-                        blackPolylineOptions.width(5);
-                        blackPolylineOptions.startCap(new SquareCap());
-                        blackPolylineOptions.jointType(JointType.ROUND);
-                        blackPolylineOptions.addAll(polylineList);
-                        blackPolyline = mMap.addPolyline(blackPolylineOptions);
-
-                        JSONObject object = jsonArray.getJSONObject(0);
-                        JSONArray legs = object.getJSONArray("legs");
-                        JSONObject legObjects = legs.getJSONObject(0);
-
-                        JSONObject time = legObjects.getJSONObject("duration");
-                        String duration = time.getString("text");
-
-                        JSONObject distanceEstimate = legObjects.getJSONObject("distance");
-                        String distance = distanceEstimate.getString("text");
-
-                        Bitmap bitmap = Common.createIconWithDuration(RequestDriverActivity.this, duration);
-                        originMarker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
-
-
                         //moving
                         handler = new Handler();
-
                         index = -1;
                         next = -1;
                         handler.postDelayed(new Runnable() {
@@ -600,7 +581,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         );
     }
 
-
     private void addDriverMarker(LatLng destination) {
         destinationMarker = mMap.addMarker(new MarkerOptions().position(destination).flat(true)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
@@ -626,6 +606,16 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         }
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onDeclineAndRemoveRequestEvent(DeclineRequestAndRemoveTripFromDriver event) {
+        if (lastDriverCall != null) {
+            Common.driverfound.get(lastDriverCall.getKey()).setDecline(true);
+
+            //Driver has been declined request, just finish this activity
+            finish();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -644,15 +634,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         iGoogleAPI = RetrofitClient.getInstance().create(IGoogleAPI.class);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;

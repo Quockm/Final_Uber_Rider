@@ -9,10 +9,20 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class SelectPlaceEvent {
     private LatLng origin, destination;
+    private String address;
 
-    public SelectPlaceEvent(LatLng origin, LatLng destination) {
+    public SelectPlaceEvent(LatLng origin, LatLng destination, String address) {
         this.origin = origin;
         this.destination = destination;
+        this.address = address;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public LatLng getOrigin() {

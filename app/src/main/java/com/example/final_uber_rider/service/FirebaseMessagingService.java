@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.final_uber_rider.Callback.Common.Common;
+import com.example.final_uber_rider.model.EventBus.DeclineRequestAndRemoveTripFromDriver;
 import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
 import com.example.final_uber_rider.model.EventBus.DriverAcceptTripEvent;
 import com.example.final_uber_rider.utils.RiderUtils;
@@ -36,12 +37,12 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         if (dataRev != null) {
             if (dataRev.get(Common.NOTI_TITLE) != null) {
                 if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE)) {
-                    Log.d("BBB","Send Request");
 
                     EventBus.getDefault().postSticky(new DeclineRequestFromDriver());
-                }
+                } else if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE_AND_REMOVE)) {
 
-                else if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_ACCEPT)) {
+                    EventBus.getDefault().postSticky(new DeclineRequestAndRemoveTripFromDriver());
+                } else if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_ACCEPT)) {
 
                     String tripKey = dataRev.get(Common.TRIP_KEY);
                     EventBus.getDefault().postSticky(new DriverAcceptTripEvent(tripKey));

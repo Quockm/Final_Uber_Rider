@@ -39,6 +39,7 @@ import java.util.Map;
 public class Common {
     public static final String RIDER_INFO_REFERENCE = "RiderInfo";
     public static final String RIDER_LOCATION_REFERENCE = "RiderLocation";
+
     public static final String DRIVER_LOCATION_REFERENCE = "DriverLocation";
     public static final String DRIVER_INFO_REFERENCE = "DriverInfo";
     public static final String REQUEST_DRIVER_TITLE = "RequestDriver";
@@ -55,7 +56,9 @@ public class Common {
     public static RiderInfoModel currentRider;
 
     public static final String TOKEN_REFERENCE = "Token";
-    public static final String TOKEN_RIDER_REFERENCE = "Token_Rider";
+    //public static final String TOKEN_RIDER_REFERENCE = "Token_Rider";
+    public static final String REQUEST_DRIVER_DECLINE_AND_REMOVE = "DeclineAndRemoveTrip";
+
 
     public static final String NOTI_TITLE = "Title";
     public static final String NOTI_CONTENT = "body";

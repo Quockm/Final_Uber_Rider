@@ -44,7 +44,8 @@ public class RiderUtils {
     public static void updateToken(Context context, String token) {
         TokenModel tokenModel = new TokenModel(token);
         FirebaseDatabase.getInstance()
-                .getReference(Common.TOKEN_RIDER_REFERENCE)
+                //.getReference(Common.TOKEN_RIDER_REFERENCE)
+                .getReference(Common.TOKEN_REFERENCE)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .setValue(tokenModel)
                 .addOnFailureListener(e -> Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show())
@@ -83,7 +84,7 @@ public class RiderUtils {
                                     .append(selectPlaceEvent.getOrigin().longitude)
                                     .toString());
 
-                            notificationData.put(Common.RIDER_DESTINATION_STRING,selectPlaceEvent.getDestinationString());
+                            notificationData.put(Common.RIDER_DESTINATION_STRING,selectPlaceEvent.getAddress());
                             notificationData.put(Common.RIDER_DESTINATION,new StringBuilder("")
                                     .append(selectPlaceEvent.getDestination().latitude)
                                     .append(",")

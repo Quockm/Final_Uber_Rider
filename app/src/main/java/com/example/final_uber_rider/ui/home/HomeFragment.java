@@ -242,7 +242,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                             LatLng destination = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
 
                             startActivity(new Intent(getContext(), RequestDriverActivity.class));
-                            EventBus.getDefault().postSticky(new SelectPlaceEvent(origin, destination));
+                            EventBus.getDefault().postSticky(new SelectPlaceEvent(origin, destination,place.getAddress()));
 
                         });
             }

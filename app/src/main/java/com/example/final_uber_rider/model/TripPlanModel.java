@@ -141,5 +141,7 @@ public class TripPlanModel {
     public void setCancel(boolean cancel) {
         isCancel = cancel;
     }
+
+
 }
 
