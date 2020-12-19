@@ -14,6 +14,29 @@ public class TripPlanModel {
     public TripPlanModel() {
     }
 
+    public TripPlanModel(String rider, String driver, DriverInfoModel driverInfoModel,
+                         RiderInfoModel riderModel, String origin, String originString,
+                         String destination, String destinationString, String distancePickup,
+                         String distanceDestination, String durationPickup, String durationDestination,
+                         double currentLat, double currentLng, boolean isDone, boolean isCancel) {
+        this.rider = rider;
+        this.driver = driver;
+        this.driverInfoModel = driverInfoModel;
+        this.riderModel = riderModel;
+        this.origin = origin;
+        this.originString = originString;
+        this.destination = destination;
+        this.destinationString = destinationString;
+        this.distancePickup = distancePickup;
+        this.distanceDestination = distanceDestination;
+        this.durationPickup = durationPickup;
+        this.durationDestination = durationDestination;
+        this.currentLat = currentLat;
+        this.currentLng = currentLng;
+        this.isDone = isDone;
+        this.isCancel = isCancel;
+    }
+
     public String getRider() {
         return rider;
     }

@@ -12,6 +12,17 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/nav_history"
+        android:name="com.example.final_uber_rider.HistoryFragment"
+        android:label="Your Trip"
+        tools:layout="@layout/fragment_history" />
+
+    <dialog
+        android:id="@+id/nav_sign_out"
+        android:name="com.example.final_uber_rider.LogoutDialog"
+        android:label="Sign Out"/>
+
+    <!--<fragment
         android:id="@+id/nav_gallery"
         android:name="com.example.final_uber_rider.ui.gallery.GalleryFragment"
         android:label="@string/menu_gallery"
@@ -21,5 +32,5 @@
         android:id="@+id/nav_slideshow"
         android:name="com.example.final_uber_rider.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_slideshow" />-->
 </navigation>
