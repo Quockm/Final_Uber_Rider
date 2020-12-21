@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ import com.example.final_uber_rider.model.AnimationModel;
 import com.example.final_uber_rider.model.DriverGeoModel;
 import com.example.final_uber_rider.model.DriverInfoModel;
 import com.example.final_uber_rider.model.EventBus.SelectPlaceEvent;
+import com.example.final_uber_rider.model.EventBus.ShowNotificationFinishTrip;
 import com.example.final_uber_rider.model.GeoQueryModel;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -80,6 +82,8 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -87,6 +91,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -143,15 +148,33 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
     private float v;
     private double lat, lng;
 
-//    private boolean isFirstTime = true;
+    private boolean isNextLaunch = false;
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+//        if (!EventBus.getDefault().isRegistered(this))
+//            EventBus.getDefault().register(this);
+    }
 
     @Override
     public void onStop() {
         compositeDisposable.clear();
         super.onStop();
+//        if (EventBus.getDefault().hasSubscriberForEvent(ShowNotificationFinishTrip.class))
+//            EventBus.getDefault().removeStickyEvent(ShowNotificationFinishTrip.class);
+//        EventBus.getDefault().unregister(this);
     }
 
+//    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+//    public void onShowNotificationFinnishTrip(ShowNotificationFinishTrip event) {
+//        Common.ShowNofication(getContext(), new Random().nextInt(),
+//                "Complete Trip",
+//                "Your Trip: " + event.getTripKey() + " has been completed!!",
+//                null);
+//
+//    }
 
     //Online system
     DatabaseReference onlineRef, currentRiderRef, riderLocationRef;
@@ -204,15 +227,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
             //geoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid());
             onlineRef.removeEventListener(onlineValueListener);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e("HomeFrag", e.getClass() + ": " + e.getMessage());
         }
     }
 
     @Override
     public void onResume() {
-
         super.onResume();
+        if (isNextLaunch) {
+            loadAvaiableDrivers();
+        } else
+            isNextLaunch = true;
     }
 
 
@@ -246,7 +272,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                             LatLng destination = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
 
                             startActivity(new Intent(getContext(), RequestDriverActivity.class));
-                            EventBus.getDefault().postSticky(new SelectPlaceEvent(origin, destination,place.getAddress()));
+                            EventBus.getDefault().postSticky(new SelectPlaceEvent(origin, destination, place.getAddress()));
 
                         });
             }
@@ -666,78 +692,78 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, IFireb
                     "less_driving",
                     from, to,
                     getActivity().getString(R.string.google_api_key))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(returnResult -> {
-                                Log.d("API_RETURN", returnResult);
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(returnResult -> {
+                        Log.d("API_RETURN", returnResult);
 
-                                try {
-                                    //parse json
-                                    JSONObject jsonObject = new JSONObject(returnResult);
-                                    JSONArray jsonArray = jsonObject.getJSONArray("routes");
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject route = jsonArray.getJSONObject(i);
-                                        JSONObject poly = route.getJSONObject("overview_polyline");
-                                        String polyline = poly.getString("points");
+                        try {
+                            //parse json
+                            JSONObject jsonObject = new JSONObject(returnResult);
+                            JSONArray jsonArray = jsonObject.getJSONArray("routes");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject route = jsonArray.getJSONObject(i);
+                                JSONObject poly = route.getJSONObject("overview_polyline");
+                                String polyline = poly.getString("points");
 
-                                        animationModel.setPolylineList(Common.decodePoly(polyline));
+                                animationModel.setPolylineList(Common.decodePoly(polyline));
 
-                                    }
+                            }
 
-                                    //moving
-                                    handler = new Handler();
+                            //moving
+                            handler = new Handler();
 
-                                    animationModel.setIndex(-1);
-                                    animationModel.setNext(1);
-                                    Runnable runnable = new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (animationModel.getPolylineList() != null &&
-                                                    animationModel.getPolylineList().size() > 1) {
-                                                if (animationModel.getIndex() < animationModel.getPolylineList().size() - 2) {
+                            animationModel.setIndex(-1);
+                            animationModel.setNext(1);
+                            Runnable runnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (animationModel.getPolylineList() != null &&
+                                            animationModel.getPolylineList().size() > 1) {
+                                        if (animationModel.getIndex() < animationModel.getPolylineList().size() - 2) {
 
-                                                    animationModel.setIndex(animationModel.getIndex() + 1);
-                                                    animationModel.setNext(animationModel.getIndex() + 1);
-                                                    animationModel.setStart(animationModel.getPolylineList().get(animationModel.getIndex()));
-                                                    animationModel.setEnd(animationModel.getPolylineList().get(animationModel.getIndex()));
-                                                }
-
-                                                ValueAnimator valueAnimator = ValueAnimator.ofInt(0, 1);
-                                                valueAnimator.setDuration(3000);
-                                                valueAnimator.setInterpolator(new LinearInterpolator());
-                                                valueAnimator.addUpdateListener(value -> {
-
-                                                    animationModel.setV(value.getAnimatedFraction());
-                                                    animationModel.setLat(animationModel.getV() * animationModel.getEnd().latitude
-                                                            + (1 - animationModel.getV()) * animationModel.getStart().latitude);
-                                                    animationModel.setLng(animationModel.getV() * animationModel.getEnd().longitude
-                                                            + (1 - animationModel.getV()) * animationModel.getStart().longitude);
-                                                    LatLng newPos = new LatLng(animationModel.getLat(), animationModel.getLng());
-                                                    currentMarker.setPosition(newPos);
-                                                    currentMarker.setAnchor(0.5f, 0.5f);
-                                                    currentMarker.setRotation(Common.getBearing(animationModel.getStart(), newPos));
-
-                                                });
-
-                                                valueAnimator.start();
-                                                if (animationModel.getIndex() < animationModel.getPolylineList().size() - 2)//Reach distination
-                                                    animationModel.getHandler().postDelayed(this, 1500);
-                                                else if (animationModel.getIndex() < animationModel.getPolylineList().size() - 1)//done
-                                                {
-                                                    animationModel.setRun(false);
-                                                    Common.driverLocationSubcribe.put(key, animationModel); // update data
-                                                }
-                                            }
+                                            animationModel.setIndex(animationModel.getIndex() + 1);
+                                            animationModel.setNext(animationModel.getIndex() + 1);
+                                            animationModel.setStart(animationModel.getPolylineList().get(animationModel.getIndex()));
+                                            animationModel.setEnd(animationModel.getPolylineList().get(animationModel.getIndex()));
                                         }
-                                    };
 
-                                    //Run handler
-                                    animationModel.getHandler().postDelayed(runnable, 1500);
+                                        ValueAnimator valueAnimator = ValueAnimator.ofInt(0, 1);
+                                        valueAnimator.setDuration(3000);
+                                        valueAnimator.setInterpolator(new LinearInterpolator());
+                                        valueAnimator.addUpdateListener(value -> {
 
-                                } catch (Exception e) {
-                                    Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
+                                            animationModel.setV(value.getAnimatedFraction());
+                                            animationModel.setLat(animationModel.getV() * animationModel.getEnd().latitude
+                                                    + (1 - animationModel.getV()) * animationModel.getStart().latitude);
+                                            animationModel.setLng(animationModel.getV() * animationModel.getEnd().longitude
+                                                    + (1 - animationModel.getV()) * animationModel.getStart().longitude);
+                                            LatLng newPos = new LatLng(animationModel.getLat(), animationModel.getLng());
+                                            currentMarker.setPosition(newPos);
+                                            currentMarker.setAnchor(0.5f, 0.5f);
+                                            currentMarker.setRotation(Common.getBearing(animationModel.getStart(), newPos));
+
+                                        });
+
+                                        valueAnimator.start();
+                                        if (animationModel.getIndex() < animationModel.getPolylineList().size() - 2)//Reach distination
+                                            animationModel.getHandler().postDelayed(this, 1500);
+                                        else if (animationModel.getIndex() < animationModel.getPolylineList().size() - 1)//done
+                                        {
+                                            animationModel.setRun(false);
+                                            Common.driverLocationSubcribe.put(key, animationModel); // update data
+                                        }
+                                    }
                                 }
-                            })
+                            };
+
+                            //Run handler
+                            animationModel.getHandler().postDelayed(runnable, 1500);
+
+                        } catch (Exception e) {
+                            Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
+                        }
+                    })
             );
         }
     }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.final_uber_rider.Callback.Common.Common;
+import com.example.final_uber_rider.model.EventBus.ShowNotificationFinishTrip;
 import com.example.final_uber_rider.utils.RiderUtils;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -31,12 +32,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class RiderHomeActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE_REQUEST = 6170 ;
+    private static final int PICK_IMAGE_REQUEST = 6170;
     private AppBarConfiguration mAppBarConfiguration;
 
     private DrawerLayout drawer;
@@ -87,8 +93,8 @@ public class RiderHomeActivity extends AppCompatActivity {
 
 
         /*Already have NavigateController to handle action NavigationItemClicked
-        * -> No need to setup Listener for Navigation Menu
-        * */
+         * -> No need to setup Listener for Navigation Menu
+         * */
         /*
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_sign_out) {
@@ -220,4 +226,21 @@ public class RiderHomeActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+//        if (!EventBus.getDefault().isRegistered(this))
+//            EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        if (EventBus.getDefault().hasSubscriberForEvent(ShowNotificationFinishTrip.class))
+//            EventBus.getDefault().removeStickyEvent(ShowNotificationFinishTrip.class);
+//        EventBus.getDefault().unregister(this);
+    }
+
+
 }

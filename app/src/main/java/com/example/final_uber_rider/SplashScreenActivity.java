@@ -76,8 +76,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_splash_screen);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-
         init();
     }
 
@@ -129,6 +127,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 .setAuthMethodPickerLayout(authMethodPickerLayout)
                 .setIsSmartLockEnabled(false)
                 .setAvailableProviders(providers)
+                .setTheme(R.style.AppTheme)
                 .build(), LOGIN_REQUEST_CODE);
     }
 

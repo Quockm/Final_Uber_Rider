@@ -29,7 +29,9 @@ import com.example.final_uber_rider.model.DriverGeoModel;
 import com.example.final_uber_rider.model.EventBus.DeclineRequestAndRemoveTripFromDriver;
 import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
 import com.example.final_uber_rider.model.EventBus.DriverAcceptTripEvent;
+import com.example.final_uber_rider.model.EventBus.DriverCompleteTripEvent;
 import com.example.final_uber_rider.model.EventBus.SelectPlaceEvent;
+import com.example.final_uber_rider.model.EventBus.ShowNotificationFinishTrip;
 import com.example.final_uber_rider.model.TripPlanModel;
 import com.example.final_uber_rider.utils.RiderUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -64,6 +66,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -342,6 +345,9 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
         if (EventBus.getDefault().hasSubscriberForEvent(DeclineRequestAndRemoveTripFromDriver.class))
             EventBus.getDefault().removeStickyEvent(DeclineRequestAndRemoveTripFromDriver.class);
 
+        if (EventBus.getDefault().hasSubscriberForEvent(DriverCompleteTripEvent.class))
+            EventBus.getDefault().removeStickyEvent(DriverCompleteTripEvent.class);
+
         EventBus.getDefault().unregister(this);
     }
 
@@ -418,7 +424,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                             String distance = distanceEstimate.getString("text");
 
 
-
                                             LatLng origin = new LatLng(
                                                     Double.parseDouble(tripPlanModel.getOrigin().split(",")[0]),
                                                     Double.parseDouble(tripPlanModel.getOrigin().split(",")[1]));
@@ -431,7 +436,6 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                                                     .include(origin)
                                                     .include(destination)
                                                     .build();
-
 
 
                                             addPickupMarkerWithDuration(duration, origin);
@@ -486,17 +490,20 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        TripPlanModel newData = snapshot.getValue(TripPlanModel.class);
 
-                        String driverNewLocation = new StringBuilder()
-                                .append(newData.getCurrentLat())
-                                .append(",")
-                                .append(newData.getCurrentLng())
-                                .toString();
+                        if(snapshot.exists()) { // check exist
+                        TripPlanModel newData = snapshot.getValue(TripPlanModel.class); // if it null, will make crash
 
-                        if (!driverOldPosition.equals(driverNewLocation)) // if not equal
-                            moveMarkerAnimation(destinationMarker, driverOldPosition, driverNewLocation);
 
+                            String driverNewLocation = new StringBuilder()
+                                    .append(newData.getCurrentLat())
+                                    .append(",")
+                                    .append(newData.getCurrentLng())
+                                    .toString();
+
+                            if (!driverOldPosition.equals(driverNewLocation)) // if not equal
+                                moveMarkerAnimation(destinationMarker, driverOldPosition, driverNewLocation);
+                        }
                     }
 
                     @Override
@@ -561,7 +568,7 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
 
                                 valueAnimator.start();
                                 if (index < polylineList.size() - 2)
-                                    handler.postDelayed( this, 1500);
+                                    handler.postDelayed(this, 1500);
                                 else if (index < polylineList.size() - 1) {
 
                                 }
@@ -614,6 +621,17 @@ public class RequestDriverActivity extends FragmentActivity implements OnMapRead
             //Driver has been declined request, just finish this activity
             finish();
         }
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onDriverCompleteTrip(DriverCompleteTripEvent event) {
+
+        //EventBus.getDefault().postSticky(new ShowNotificationFinishTrip(event.getTripKey()));
+        Common.ShowNofication(this, new Random().nextInt(),
+                "Complete Trip",
+                "Your Trip: " + event.getTripKey() + " has been completed!!",
+                null);
+        finish();
     }
 
     @Override

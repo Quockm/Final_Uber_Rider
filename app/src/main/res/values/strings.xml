@@ -53,4 +53,6 @@
     <string name="driver_name">Hermes Khong</string>
     <string name="ascii_dot">■</string>
     <string name="know">Knows English</string>
+    <string name="trip_complete">Trip Complete Successfully</string>
+    <string name="lets_me_know_if_you_like_your_trip_nwe_hope_to_see_you_again">Lets me know if you like your Trip. \nWe hope to see you again!!</string>
 </resources>
