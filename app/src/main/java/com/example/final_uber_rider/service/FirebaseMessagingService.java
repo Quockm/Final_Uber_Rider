@@ -9,6 +9,7 @@ import com.example.final_uber_rider.model.EventBus.DeclineRequestAndRemoveTripFr
 import com.example.final_uber_rider.model.EventBus.DeclineRequestFromDriver;
 import com.example.final_uber_rider.model.EventBus.DriverAcceptTripEvent;
 import com.example.final_uber_rider.model.EventBus.DriverCompleteTripEvent;
+import com.example.final_uber_rider.model.EventBus.DriverStartUber;
 import com.example.final_uber_rider.utils.RiderUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.RemoteMessage;
@@ -40,13 +41,20 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE)) {
 
                     EventBus.getDefault().postSticky(new DeclineRequestFromDriver());
+
                 } else if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_DECLINE_AND_REMOVE)) {
 
                     EventBus.getDefault().postSticky(new DeclineRequestAndRemoveTripFromDriver());
+
                 } else if (dataRev.get(Common.NOTI_TITLE).equals(Common.REQUEST_DRIVER_ACCEPT)) {
 
                     String tripKey = dataRev.get(Common.TRIP_KEY);
                     EventBus.getDefault().postSticky(new DriverAcceptTripEvent(tripKey));
+
+                } else if (dataRev.get(Common.NOTI_TITLE).equals(Common.DRIVER_START_UBER)) {
+
+                    EventBus.getDefault().postSticky(new DriverStartUber());
+
                 } else if (dataRev.get(Common.NOTI_TITLE).equals(Common.RIDER_COMPLETE_TRIP)) {
 
                     String tripKey = dataRev.get(Common.TRIP_KEY);

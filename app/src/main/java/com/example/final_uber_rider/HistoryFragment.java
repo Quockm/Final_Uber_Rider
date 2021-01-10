@@ -60,6 +60,7 @@ public class HistoryFragment extends Fragment {
     private void onLoadHistoryData(){
         HistoryAdapter adapter = new HistoryAdapter(initListData());
         rv_list_history.setAdapter(adapter);
+
     }
 
     /*
@@ -71,7 +72,7 @@ public class HistoryFragment extends Fragment {
         for (int i = 0; i < 10; i++){
             listTest.add(new TripPlanModel("", "", null,
                     new RiderInfoModel("" + i, "Test ", "+19999999999", "", 5.0),
-                    "", "", "","","",
+                    "", "", "","","","",
                     "","","",0.0,0.0, true, false));
         }
 

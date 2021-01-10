@@ -41,6 +41,16 @@
         <include layout="@layout/layout_finding_your_driver" />
 
         <include layout="@layout/layout_driver_info"/>
+
+    </FrameLayout>
+
+    <FrameLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <include layout="@layout/layout_trip_success"/>
     </FrameLayout>
 
 

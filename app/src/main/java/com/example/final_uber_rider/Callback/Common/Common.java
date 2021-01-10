@@ -52,6 +52,7 @@ public class Common {
     public static final String REQUEST_DRIVER_ACCEPT = "Accept";
     public static final String TRIP_KEY = "TripKey";
     public static final String TRIP = "Trips";
+    public static final String SEND_NOTE = "Sendnote";
 
     public static RiderInfoModel currentRider;
 
@@ -59,6 +60,10 @@ public class Common {
     public static final String TOKEN_RIDER_REFERENCE = "Token_Rider";
     public static final String REQUEST_DRIVER_DECLINE_AND_REMOVE = "DeclineAndRemoveTrip";
     public static final String RIDER_COMPLETE_TRIP = "DriverCompleteTrip";
+    public static final String DRIVER_START_UBER = "DriverStartUber";
+    public static final String TRIP_DESTINATION_LOCATION_REF = "TripDestinationLocation";
+
+
 
 
     public static final String NOTI_TITLE = "Title";

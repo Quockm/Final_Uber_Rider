@@ -159,7 +159,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             //Toast.makeText(SplashScreenActivity.this, "User already register", Toast.LENGTH_SHORT).show();
-                            RiderInfoModel riderInfoModel = snapshot.getValue(RiderInfoModel.class);
+                                RiderInfoModel riderInfoModel = snapshot.getValue(RiderInfoModel.class);
+
                             gotoHomeActivity(riderInfoModel);
                         } else {
                             showRegisterLayout();

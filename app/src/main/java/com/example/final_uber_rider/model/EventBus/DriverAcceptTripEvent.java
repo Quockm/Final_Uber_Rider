@@ -7,6 +7,10 @@ public class DriverAcceptTripEvent {
         this.tripIp = tripIp;
     }
 
+    public DriverAcceptTripEvent() {
+
+    }
+
     public String getTripIp() {
         return tripIp;
     }

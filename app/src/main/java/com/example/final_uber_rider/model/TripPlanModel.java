@@ -10,6 +10,9 @@ public class TripPlanModel {
     private String durationPickup, durationDestination;
     private double currentLat, currentLng;
     private boolean isDone, isCancel;
+    private String time;
+
+
 
     public TripPlanModel() {
     }
@@ -17,7 +20,7 @@ public class TripPlanModel {
     public TripPlanModel(String rider, String driver, DriverInfoModel driverInfoModel,
                          RiderInfoModel riderModel, String origin, String originString,
                          String destination, String destinationString, String distancePickup,
-                         String distanceDestination, String durationPickup, String durationDestination,
+                         String distanceDestination, String durationPickup, String durationDestination, String time,
                          double currentLat, double currentLng, boolean isDone, boolean isCancel) {
         this.rider = rider;
         this.driver = driver;
@@ -35,6 +38,15 @@ public class TripPlanModel {
         this.currentLng = currentLng;
         this.isDone = isDone;
         this.isCancel = isCancel;
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getRider() {
@@ -164,6 +176,8 @@ public class TripPlanModel {
     public void setCancel(boolean cancel) {
         isCancel = cancel;
     }
+
+
 
 
 }

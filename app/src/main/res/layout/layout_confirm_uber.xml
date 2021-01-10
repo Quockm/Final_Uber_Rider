@@ -54,27 +54,6 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:weightSum="2"-->
-<!--            android:orientation="horizontal">-->
-
-
-<!--            <ImageView-->
-<!--                android:layout_weight="1"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="100dp"-->
-<!--                android:src="@drawable/baby_car"/>-->
-
-<!--            <ImageView-->
-<!--                android:layout_weight="1"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="100dp"-->
-<!--                android:src="@drawable/limousine"/>-->
-
-
-<!--        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
